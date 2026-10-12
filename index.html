@@ -25,12 +25,15 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:6px 4px;b
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:20px;display:none}
 dialog{border:0;border-radius:14px;width:90%;max-width:400px}dialog label{display:block;margin:8px 0 4px;font-size:14px}
 </style></head><body>
-<div class="banner">⚠️ נתונים לדוגמה – אב-טיפוס להדגמה בלבד<br><span style="font-weight:400;font-size:12px">קודים לדוגמה: דנה 1234 · יוסי 2345 · אבי 3456 · מיכל 4567 · עומר 5678</span></div>
+<div class="banner">⚠️ נתונים לדוגמה – אב-טיפוס להדגמה בלבד<br><span style="font-weight:400;font-size:12px">משתמשים לדוגמה (סיסמה 1234 לכולם): dana · yossi · avi · michal · omer</span></div>
 <header><div><b>Auto Point</b><br><small>שעון נוכחות · האומן 1, יבנה</small></div><div id="hdrclock"></div></header>
 <nav><button data-t="emp" class="on">עובד</button><button data-t="mgr">מנהל</button><button data-t="hist">היסטוריה</button><button data-t="fut">פיצ'רים עתידיים</button></nav>
 <main>
+<section id="login" hidden><div class="card"><h3 style="margin-top:0">התחברות חד-פעמית</h3><div class="muted">מתחברים פעם אחת – הטלפון יזכור אותך.</div>
+ <label class="muted">שם משתמש</label><input id="lu" autocapitalize="off" dir="ltr"><label class="muted">סיסמה</label><input id="lp" type="password" dir="ltr">
+ <button class="btn" id="lgo" style="width:100%;margin-top:12px;font-size:18px">התחבר</button><div id="lerr" style="color:#a32020;text-align:center;margin-top:6px"></div></div></section>
 <section id="emp">
- <div class="card"><label class="muted">הזן קוד אישי (4 ספרות)</label><input id="pin" inputmode="numeric" maxlength="4" placeholder="••••" style="text-align:center;font-size:26px;letter-spacing:10px"><select id="empSel" hidden></select>
+ <div class="card"><select id="empSel" hidden></select>
  <div id="who" style="text-align:center;margin-top:6px;font-weight:700"></div>
  <div class="clock" id="bigclock"></div><div class="muted" style="text-align:center" id="today"></div>
  <div id="status" style="text-align:center;margin-top:6px"></div></div>
@@ -75,7 +78,7 @@ dialog{border:0;border-radius:14px;width:90%;max-width:400px}dialog label{displa
 <script>
 const STORE={lat:31.8667193,lng:34.7422365},RADIUS=50,KEY='ap_attendance_demo_v1';
 const DAYS=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
-const EMPLOYEES=[{id:1,pin:'1234',name:'דנה כהן',role:'מנהלת משמרת'},{id:2,pin:'2345',name:'יוסי לוי',role:'מוכר'},{id:3,pin:'3456',name:'אבי מזרחי',role:'מחסנאי'},{id:4,pin:'4567',name:'מיכל פרץ',role:'קופאית'},{id:5,pin:'5678',name:'עומר ביטון',role:'טכנאי'}];
+const EMPLOYEES=[{id:1,user:'dana',pass:'1234',name:'דנה כהן',role:'מנהלת משמרת'},{id:2,user:'yossi',pass:'1234',name:'יוסי לוי',role:'מוכר'},{id:3,user:'avi',pass:'1234',name:'אבי מזרחי',role:'מחסנאי'},{id:4,user:'michal',pass:'1234',name:'מיכל פרץ',role:'קופאית'},{id:5,user:'omer',pass:'1234',name:'עומר ביטון',role:'טכנאי'}];
 const $=id=>document.getElementById(id),pad=n=>String(n).padStart(2,'0');
 const dkey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),hm=d=>pad(d.getHours())+':'+pad(d.getMinutes());
 function rng(s){return()=>(s=(s*16807)%2147483647)/2147483647}
@@ -92,17 +95,20 @@ const open=id=>db.find(p=>p.emp===id&&!p.out);
 EMPLOYEES.forEach(e=>{$('empSel').add(new Option(e.name,e.id));$('hEmp').add(new Option(e.name,e.id))});
 const m0=new Date().toISOString().slice(0,7);const pm=new Date();pm.setDate(1);pm.setMonth(pm.getMonth()-1);$('month').value=pm.getFullYear()+'-'+pad(pm.getMonth()+1);$('hMonth').value=m0;
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
- document.querySelectorAll('main section').forEach(s=>s.hidden=s.id!==b.dataset.t);render()});
+ document.querySelectorAll('main section').forEach(s=>s.hidden=s.id!==b.dataset.t);render();showEmp()});
 let dist=null;function hav(a,b,c,d){const R=6371e3,t=Math.PI/180,x=Math.sin((c-a)*t/2)**2+Math.cos(a*t)*Math.cos(c*t)*Math.sin((d-b)*t/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
 if(navigator.geolocation)navigator.geolocation.watchPosition(p=>{dist=hav(p.coords.latitude,p.coords.longitude,STORE.lat,STORE.lng);renderEmp()},e=>{dist=-1;renderEmp()},{enableHighAccuracy:true});else dist=-1;
-$('demo').onchange=renderEmp;$('pin').oninput=()=>{const e=EMPLOYEES.find(x=>x.pin===$('pin').value);if(e)$('empSel').value=e.id;renderEmp()};$('empSel').onchange=renderEmp;
+$('demo').onchange=renderEmp;const ME=()=>EMPLOYEES.find(x=>x.id===+localStorage.getItem('ap_user'));
+$('lgo').onclick=()=>{const e=EMPLOYEES.find(x=>x.user===$('lu').value.trim().toLowerCase()&&x.pass===$('lp').value);if(!e)return $('lerr').textContent='שם משתמש או סיסמה שגויים';localStorage.setItem('ap_user',e.id);showEmp()};
+window.logout=()=>{localStorage.removeItem('ap_user');showEmp()};
+function showEmp(){const t=document.querySelector('nav button.on').dataset.t;if(t!=='emp')return;$('login').hidden=!!ME();$('emp').hidden=!ME();renderEmp()}$('empSel').onchange=renderEmp;
 function allowed(){return $('demo').checked||(dist!=null&&dist>=0&&dist<=RADIUS)}
 function renderEmp(){const d=$('dist'),demo=$('demo').checked;
  if(demo){d.className='dist ok';d.textContent='מצב הדגמה פעיל – בדיקת GPS מושבתת'}
  else if(dist==null){d.className='dist';d.textContent='מאתר מיקום…'}
  else if(dist<0){d.className='dist bad';d.textContent='אין גישה למיקום – אפשר הרשאת GPS'}
  else{const ok=dist<=RADIUS;d.className='dist '+(ok?'ok':'bad');d.textContent=(ok?'✅ בטווח החנות':'❌ מחוץ לטווח')+' · מרחק: '+(dist<1000?Math.round(dist)+' מ\'':(dist/1000).toFixed(1)+' ק"מ')}
- const me=EMPLOYEES.find(x=>x.pin===$('pin').value);$('who').innerHTML=me?'שלום, '+me.name+' 👋':($('pin').value.length===4?'<span style="color:#a32020">קוד שגוי</span>':'');const id=+$('empSel').value,o=open(id),a=allowed()&&!!me;$('bIn').disabled=!a||!!o;$('bOut').disabled=!a||!o;
+const me=ME();if(!me)return;$('empSel').value=me.id;$('who').innerHTML='שלום, '+me.name+' 👋 <a href="#" onclick="logout();return false" style="font-size:12px;font-weight:400">(התנתק)</a>';const id=+$('empSel').value,o=open(id),a=allowed()&&!!me;$('bIn').disabled=!a||!!o;$('bOut').disabled=!a||!o;
  $('status').innerHTML=!me?'':o?'<span class="pill pin">בעבודה מאז '+hm(new Date(o.in))+'</span>':'<span class="pill pout">לא במשמרת</span>'}
 $('bIn').onclick=()=>{const id=+$('empSel').value;if(!allowed()||open(id)||$('bIn').disabled)return;db.push({id:Date.now()+'',emp:id,in:new Date().toISOString(),out:null});save();renderEmp();toast('נרשמה כניסה ✔')};
 $('bOut').onclick=()=>{const o=open(+$('empSel').value);if(!allowed()||!o||$('bOut').disabled)return;o.out=new Date().toISOString();save();renderEmp();toast('נרשמה יציאה ✔ ('+hours(o).toFixed(2)+' ש\')')};
@@ -127,5 +133,5 @@ function buildWorkbook(m){const aoa=[['דוח נוכחות חודשי – Auto P
  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'דוח '+m);wb.Workbook={Views:[{RTL:true}]};return wb}
 window.buildWorkbook=buildWorkbook;
 $('xls').onclick=()=>XLSX.writeFile(buildWorkbook($('month').value),'דוח_נוכחות_'+$('month').value+'_לדוגמה.xlsx');
-function render(){renderEmp();renderMgr();renderHist()}render();
+function render(){renderEmp();renderMgr();renderHist()}render();showEmp();
 </script></body></html>
