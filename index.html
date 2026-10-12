@@ -20,7 +20,7 @@ select,input{width:100%;padding:10px;font-size:16px;border:1px solid #ccc;border
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:6px 4px;border-bottom:1px solid #eee;text-align:right}th{background:#f6f8fb}
 .pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:12px}.pin{background:#e3f6ea;color:#14713a}.pout{background:#eee;color:#555}
 .btn{background:#0d3b66;color:#fff;border:0;border-radius:10px;padding:10px 14px;font-size:15px;cursor:pointer}.btn.s{padding:4px 10px;font-size:12px}
-.row{display:flex;gap:8px;align-items:center}.feat h3{margin:0 0 6px}.soon{float:left;background:#e8eefc;color:#2a4a9a;font-size:11px;padding:2px 8px;border-radius:20px}
+.row{display:flex;gap:8px;align-items:center}.row>*{min-width:0}input{min-width:0}body{overflow-x:hidden}.feat h3{margin:0 0 6px}.soon{float:left;background:#e8eefc;color:#2a4a9a;font-size:11px;padding:2px 8px;border-radius:20px}
 .mock{border:1px dashed #bbb;border-radius:10px;padding:10px;margin-top:8px;background:#fafbfd;font-size:13px}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:20px;display:none}
 dialog{border:0;border-radius:14px;width:90%;max-width:400px}dialog label{display:block;margin:8px 0 4px;font-size:14px}
@@ -40,18 +40,19 @@ dialog{border:0;border-radius:14px;width:90%;max-width:400px}dialog label{displa
  <div class="card"><div class="dist" id="dist">מאתר מיקום…</div>
  <label class="toggle"><input type="checkbox" id="demo"> מצב הדגמה – דלג על GPS</label>
  <div class="big"><button class="in" id="bIn">כניסה</button><button class="out" id="bOut">יציאה</button></div>
- <div class="muted" style="margin-top:8px">החתמה מותרת רק בטווח של 50 מ' מהחנות.</div></div>
+ <div class="muted" style="margin-top:8px">החתמה מותרת רק בטווח של 50 מ' מהחנות, בכל שעה (שעות החנות 08:00–17:00).</div></div>
 </section>
 <section id="mgr" hidden>
  <div class="card"><h3 style="margin-top:0">בחנות עכשיו <span id="nowCnt"></span></h3><div id="nowList"></div></div>
- <div class="card"><h3 style="margin-top:0">עובדים</h3><table><thead><tr><th>שם</th><th>תפקיד</th><th>ימים החודש</th><th>שעות החודש</th></tr></thead><tbody id="empTbl"></tbody></table></div>
+ <div class="card"><h3 style="margin-top:0">עובדים</h3><table><thead><tr><th>שם</th><th>תפקיד</th><th>ימים</th><th>שעות</th><th>נוספות (&gt;9)</th></tr></thead><tbody id="empTbl"></tbody></table></div>
 <div class="card"><h3 style="margin-top:0">🔔 תזכורות לעובדים <span class="soon">הדגמה – לא נשלח דבר</span></h3>
  <div class="muted">תזכורת למי ששכח להחתים כניסה או יציאה.</div>
  <label class="toggle" style="background:#eef4ff;border-color:#7aa"><input type="checkbox" checked disabled> התראת Push באפליקציה</label>
  <label class="toggle" style="background:#e9f9ee;border-color:#4a8"><input type="checkbox" checked disabled> הודעת WhatsApp</label>
- <div class="row" style="margin-top:8px"><div style="flex:1"><span class="muted">תזכורת כניסה אם לא הוחתם עד</span><input type="time" value="09:15"></div><div style="flex:1"><span class="muted">תזכורת יציאה אם לא הוחתם עד</span><input type="time" value="19:30"></div></div>
+ <div class="muted" style="margin-top:8px">שעות החנות: 08:00–17:00 (החתמה מותרת בכל שעה בטווח 50 מ')</div>
+ <div class="row" style="margin-top:6px"><div style="flex:1"><span class="muted">לא החתים כניסה עד</span><input type="time" value="08:15"></div><div style="flex:1"><span class="muted">עדיין בפנים ב-</span><input type="time" value="17:15"></div><div style="flex:1"><span class="muted">תזכורת חוזרת</span><input type="time" value="19:00"></div></div>
  <div class="mock"><b>תצוגה מקדימה – Push</b><div style="background:#222;color:#fff;border-radius:12px;padding:10px;margin-top:6px">🔔 <b>Auto Point · שעון נוכחות</b><br>היי יוסי, לא נרשמה כניסה היום. הגעת לחנות? הקש להחתמה.</div></div>
- <div class="mock"><b>תצוגה מקדימה – WhatsApp</b><div style="background:#dcf8c6;border-radius:10px;padding:10px;margin-top:6px">שלום אבי 👋<br>לא נרשמה יציאה היום ב-Auto Point (יבנה).<br>שכחת להחתים? השב "יצאתי 18:45" או לחץ: <u>החתם יציאה</u><br><span class="muted">19:30 ✓✓</span></div></div>
+ <div class="mock"><b>תצוגה מקדימה – WhatsApp</b><div style="background:#dcf8c6;border-radius:10px;padding:10px;margin-top:6px">שלום אבי 👋<br>לא נרשמה יציאה היום ב-Auto Point (יבנה).<br>שכחת להחתים? השב "יצאתי 18:45" או לחץ: <u>החתם יציאה</u><br><span class="muted">17:15 ✓✓ (תזכורת חוזרת ב-19:00)</span></div></div>
 </div>
  <div class="card"><h3 style="margin-top:0">דוח חודשי לאקסל</h3><div class="row"><input type="month" id="month"><button class="btn" id="xls">הורד Excel</button></div>
  <button class="btn" style="background:#888;margin-top:10px" id="reset">איפוס נתוני הדגמה</button></div>
@@ -90,7 +91,7 @@ function sample(){const r=rng(42),out=[],now=new Date(),start=new Date(now.getFu
 let db=JSON.parse(localStorage.getItem(KEY)||'null');if(!db){db=sample();save()}
 function save(){localStorage.setItem(KEY,JSON.stringify(db))}
 function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',2500)}
-const hours=p=>p.out?(new Date(p.out)-new Date(p.in))/36e5:0;
+const OT=9,ot=p=>Math.max(0,hours(p)-OT);const hours=p=>p.out?(new Date(p.out)-new Date(p.in))/36e5:0;
 const open=id=>db.find(p=>p.emp===id&&!p.out);
 EMPLOYEES.forEach(e=>{$('empSel').add(new Option(e.name,e.id));$('hEmp').add(new Option(e.name,e.id))});
 const m0=new Date().toISOString().slice(0,7);const pm=new Date();pm.setDate(1);pm.setMonth(pm.getMonth()-1);$('month').value=pm.getFullYear()+'-'+pad(pm.getMonth()+1);$('hMonth').value=m0;
@@ -116,20 +117,20 @@ function tick(){const n=new Date();$('bigclock').textContent=hm(n)+':'+pad(n.get
 function monthRows(m,emp){return db.filter(p=>p.in.slice(0,7)===m&&(!emp||p.emp===emp)).sort((a,b)=>a.in<b.in?-1:1)}
 function renderMgr(){const ins=EMPLOYEES.filter(e=>open(e.id));$('nowCnt').textContent='('+ins.length+')';
  $('nowList').innerHTML=ins.map(e=>'<div style="padding:6px 0">🟢 <b>'+e.name+'</b> <span class="muted">מאז '+hm(new Date(open(e.id).in))+'</span></div>').join('')||'<div class="muted">אין אף אחד בחנות</div>';
- const m=$('month').value;$('empTbl').innerHTML=EMPLOYEES.map(e=>{const r=monthRows(m,e.id).filter(p=>p.out);return '<tr><td>'+e.name+'</td><td>'+e.role+'</td><td>'+new Set(r.map(p=>p.in.slice(0,10))).size+'</td><td>'+r.reduce((s,p)=>s+hours(p),0).toFixed(1)+'</td></tr>'}).join('')}
+ const m=$('month').value;$('empTbl').innerHTML=EMPLOYEES.map(e=>{const r=monthRows(m,e.id).filter(p=>p.out);return '<tr><td>'+e.name+'</td><td>'+e.role+'</td><td>'+new Set(r.map(p=>p.in.slice(0,10))).size+'</td><td>'+r.reduce((s,p)=>s+hours(p),0).toFixed(1)+'</td><td style="color:#b35c00;font-weight:700">'+r.reduce((s,p)=>s+ot(p),0).toFixed(1)+'</td></tr>'}).join('')}
 $('month').onchange=renderMgr;$('hEmp').onchange=renderHist;$('hMonth').onchange=renderHist;
 function renderHist(){const r=db.filter(p=>p.emp===+$('hEmp').value&&p.in.slice(0,7)===$('hMonth').value).sort((a,b)=>a.in<b.in?1:-1);
- $('hTbl').innerHTML=r.map(p=>{const i=new Date(p.in);return '<tr><td>'+i.toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit'})+'</td><td>'+DAYS[i.getDay()]+'</td><td>'+hm(i)+'</td><td>'+(p.out?hm(new Date(p.out)):'<span class="pill pin">פתוח</span>')+'</td><td>'+(p.out?hours(p).toFixed(2):'')+'</td><td><button class="btn s" onclick="edit(\''+p.id+'\')">תקן</button></td></tr>'}).join('')||'<tr><td colspan=6 class="muted">אין החתמות</td></tr>'}
+ $('hTbl').innerHTML=r.map(p=>{const i=new Date(p.in);return '<tr><td>'+i.toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit'})+'</td><td>'+DAYS[i.getDay()]+'</td><td>'+hm(i)+'</td><td>'+(p.out?hm(new Date(p.out)):'<span class="pill pin">פתוח</span>')+'</td><td>'+(p.out?hours(p).toFixed(2)+(ot(p)>0?' <span class="pill" style="background:#ffe7c7;color:#b35c00">+'+ot(p).toFixed(2)+' נוספות</span>':''):'')+'</td><td><button class="btn s" onclick="edit(\''+p.id+'\')">תקן</button></td></tr>'}).join('')||'<tr><td colspan=6 class="muted">אין החתמות</td></tr>'}
 let cur;window.edit=id=>{cur=db.find(p=>p.id===id);const e=EMPLOYEES.find(x=>x.id===cur.emp);$('dlgInfo').textContent=e.name+' · '+new Date(cur.in).toLocaleDateString('he-IL');$('eIn').value=hm(new Date(cur.in));$('eOut').value=cur.out?hm(new Date(cur.out)):'';$('dlg').showModal()};
 function setT(iso,t){const d=new Date(iso);const[h,m]=t.split(':');d.setHours(+h,+m,0,0);return d.toISOString()}
 $('eSave').onclick=()=>{if(!$('eIn').value)return;cur.in=setT(cur.in,$('eIn').value);cur.out=$('eOut').value?setT(cur.in,$('eOut').value):null;if(cur.out&&cur.out<cur.in)return toast('יציאה לפני כניסה');cur.edited=true;save();$('dlg').close();render();toast('ההחתמה עודכנה')};
 $('eDel').onclick=()=>{if(confirm('למחוק החתמה?')){db=db.filter(p=>p!==cur);save();$('dlg').close();render()}};$('eCancel').onclick=()=>$('dlg').close();
 $('reset').onclick=()=>{if(confirm('לאפס לנתוני הדגמה?')){db=sample();save();render();toast('אופס')}};
-function buildWorkbook(m){const aoa=[['דוח נוכחות חודשי – Auto Point, האומן 1 יבנה – '+m],['⚠️ נתונים לדוגמה – אינם נתונים אמיתיים'],[],['עובד','תאריך','יום','כניסה','יציאה','שעות ביום']];
- const sum=[[],['סיכום לפי עובד'],['עובד','סה"כ ימי עבודה','סה"כ שעות']];
- EMPLOYEES.forEach(e=>{const r=monthRows(m,e.id);let t=0;r.forEach(p=>{const i=new Date(p.in),h=hours(p);t+=h;aoa.push([e.name,i.toLocaleDateString('he-IL'),DAYS[i.getDay()],hm(i),p.out?hm(new Date(p.out)):'חסר',p.out?+h.toFixed(2):''])});
-  const days=new Set(r.map(p=>p.in.slice(0,10))).size;aoa.push(['סה"כ – '+e.name,'','','','סה"כ ימי עבודה: '+days,'סה"כ שעות: '+t.toFixed(2)],[]);sum.push([e.name,days,+t.toFixed(2)])});
- const ws=XLSX.utils.aoa_to_sheet(aoa.concat(sum));ws['!cols']=[{wch:18},{wch:12},{wch:8},{wch:8},{wch:18},{wch:16}];
+function buildWorkbook(m){const aoa=[['דוח נוכחות חודשי – Auto Point, האומן 1 יבנה – '+m],['⚠️ נתונים לדוגמה – אינם נתונים אמיתיים'],[],['עובד','תאריך','יום','כניסה','יציאה','שעות ביום','שעות נוספות (מעל 9)']];
+ const sum=[[],['סיכום לפי עובד'],['עובד','סה"כ ימי עבודה','סה"כ שעות','סה"כ שעות נוספות']];
+ EMPLOYEES.forEach(e=>{const r=monthRows(m,e.id);let t=0,to=0;r.forEach(p=>{const i=new Date(p.in),h=hours(p);t+=h;to+=ot(p);aoa.push([e.name,i.toLocaleDateString('he-IL'),DAYS[i.getDay()],hm(i),p.out?hm(new Date(p.out)):'חסר',p.out?+h.toFixed(2):'',p.out&&ot(p)>0?+ot(p).toFixed(2):''])});
+  const days=new Set(r.map(p=>p.in.slice(0,10))).size;aoa.push(['סה"כ – '+e.name,'','','','סה"כ ימי עבודה: '+days,'סה"כ שעות: '+t.toFixed(2),'סה"כ נוספות: '+to.toFixed(2)],[]);sum.push([e.name,days,+t.toFixed(2),+to.toFixed(2)])});
+ const ws=XLSX.utils.aoa_to_sheet(aoa.concat(sum));ws['!cols']=[{wch:18},{wch:12},{wch:8},{wch:8},{wch:18},{wch:16},{wch:18}];
  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'דוח '+m);wb.Workbook={Views:[{RTL:true}]};return wb}
 window.buildWorkbook=buildWorkbook;
 $('xls').onclick=()=>XLSX.writeFile(buildWorkbook($('month').value),'דוח_נוכחות_'+$('month').value+'_לדוגמה.xlsx');
