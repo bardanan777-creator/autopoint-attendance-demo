@@ -1,0 +1,122 @@
+<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Auto Point – שעון נוכחות (הדגמה)</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Arial,sans-serif;background:#f1f4f8;color:#1c2430}
+.banner{background:#ffcc00;color:#000;text-align:center;font-weight:700;padding:6px;font-size:14px}
+header{background:#0d3b66;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+header b{font-size:20px}header small{opacity:.8}
+nav{display:flex;background:#fff;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:5}
+nav button{flex:1;border:0;background:none;padding:12px 4px;font-size:14px;cursor:pointer;border-bottom:3px solid transparent}
+nav button.on{border-color:#0d3b66;font-weight:700;color:#0d3b66}
+main{padding:14px;max-width:560px;margin:auto}.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px #0001}
+select,input{width:100%;padding:10px;font-size:16px;border:1px solid #ccc;border-radius:10px}
+.big{display:flex;gap:10px;margin-top:12px}.big button{flex:1;font-size:24px;padding:26px 0;border:0;border-radius:16px;color:#fff;font-weight:700}
+.in{background:#1b9e4b}.out{background:#d64545}button:disabled{opacity:.35}
+.clock{font-size:42px;text-align:center;font-weight:700;letter-spacing:2px}.muted{color:#667;font-size:13px}
+.dist{text-align:center;font-size:16px;padding:8px;border-radius:10px;margin-top:8px}.ok{background:#e3f6ea;color:#14713a}.bad{background:#fde8e8;color:#a32020}
+.toggle{display:flex;align-items:center;gap:8px;background:#fff6d6;border:1px dashed #c9a400;padding:10px;border-radius:10px;margin-top:10px;font-size:14px}
+.toggle input{width:auto;transform:scale(1.4)}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:6px 4px;border-bottom:1px solid #eee;text-align:right}th{background:#f6f8fb}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:12px}.pin{background:#e3f6ea;color:#14713a}.pout{background:#eee;color:#555}
+.btn{background:#0d3b66;color:#fff;border:0;border-radius:10px;padding:10px 14px;font-size:15px;cursor:pointer}.btn.s{padding:4px 10px;font-size:12px}
+.row{display:flex;gap:8px;align-items:center}.feat h3{margin:0 0 6px}.soon{float:left;background:#e8eefc;color:#2a4a9a;font-size:11px;padding:2px 8px;border-radius:20px}
+.mock{border:1px dashed #bbb;border-radius:10px;padding:10px;margin-top:8px;background:#fafbfd;font-size:13px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:20px;display:none}
+dialog{border:0;border-radius:14px;width:90%;max-width:400px}dialog label{display:block;margin:8px 0 4px;font-size:14px}
+</style></head><body>
+<div class="banner">⚠️ נתונים לדוגמה – אב-טיפוס להדגמה בלבד</div>
+<header><div><b>Auto Point</b><br><small>שעון נוכחות · האומן 1, יבנה</small></div><div id="hdrclock"></div></header>
+<nav><button data-t="emp" class="on">עובד</button><button data-t="mgr">מנהל</button><button data-t="hist">היסטוריה</button><button data-t="fut">פיצ'רים עתידיים</button></nav>
+<main>
+<section id="emp">
+ <div class="card"><label class="muted">בחר עובד</label><select id="empSel"></select>
+ <div class="clock" id="bigclock"></div><div class="muted" style="text-align:center" id="today"></div>
+ <div id="status" style="text-align:center;margin-top:6px"></div></div>
+ <div class="card"><div class="dist" id="dist">מאתר מיקום…</div>
+ <label class="toggle"><input type="checkbox" id="demo"> מצב הדגמה – דלג על GPS</label>
+ <div class="big"><button class="in" id="bIn">כניסה</button><button class="out" id="bOut">יציאה</button></div>
+ <div class="muted" style="margin-top:8px">החתמה מותרת רק בטווח של 50 מ' מהחנות.</div></div>
+</section>
+<section id="mgr" hidden>
+ <div class="card"><h3 style="margin-top:0">בחנות עכשיו <span id="nowCnt"></span></h3><div id="nowList"></div></div>
+ <div class="card"><h3 style="margin-top:0">עובדים</h3><table><thead><tr><th>שם</th><th>תפקיד</th><th>ימים החודש</th><th>שעות החודש</th></tr></thead><tbody id="empTbl"></tbody></table></div>
+ <div class="card"><h3 style="margin-top:0">דוח חודשי לאקסל</h3><div class="row"><input type="month" id="month"><button class="btn" id="xls">הורד Excel</button></div>
+ <button class="btn" style="background:#888;margin-top:10px" id="reset">איפוס נתוני הדגמה</button></div>
+</section>
+<section id="hist" hidden>
+ <div class="card"><div class="row"><select id="hEmp"></select><input type="month" id="hMonth"></div></div>
+ <div class="card" style="padding:6px"><table><thead><tr><th>תאריך</th><th>יום</th><th>כניסה</th><th>יציאה</th><th>שעות</th><th></th></tr></thead><tbody id="hTbl"></tbody></table></div>
+</section>
+<section id="fut" hidden>
+ <div class="card feat"><span class="soon">בקרוב</span><h3>⏱️ שעות נוספות</h3>חישוב אוטומטי של 125%/150% לפי חוק, מעל 8.6 שעות ביום.
+  <div class="mock">דנה כהן · השבוע: 41.5 ש' רגילות · <b>3.5 ש' נוספות (125%)</b></div></div>
+ <div class="card feat"><span class="soon">בקרוב</span><h3>☕ הפסקות</h3>כפתור "יציאה להפסקה / חזרה" וקיזוז הפסקות לא בתשלום.
+  <div class="mock"><button class="btn s" disabled>התחל הפסקה</button> &nbsp; הפסקות היום: 30 דק'</div></div>
+ <div class="card feat"><span class="soon">בקרוב</span><h3>🌴 בקשות חופש ומחלה</h3>העובד מגיש בקשה (כולל צילום אישור מחלה), המנהל מאשר/דוחה.
+  <div class="mock">יוסי לוי · חופשה 20–22/10 · <span class="pill pout">ממתין לאישור</span> <button class="btn s" disabled>אשר</button></div></div>
+ <div class="card feat"><span class="soon">בקרוב</span><h3>🔔 התראה כששכחו להחתים יציאה</h3>הודעת SMS/Push לעובד ולמנהל אם אין יציאה שעה אחרי סגירת החנות.
+  <div class="mock">🔔 "שלום אבי, לא נרשמה יציאה היום. להחתים יציאה ב-19:00?" <button class="btn s" disabled>כן</button></div></div>
+</section>
+</main>
+<dialog id="dlg"><h3 style="margin-top:0">תיקון החתמה</h3><div id="dlgInfo" class="muted"></div>
+<label>כניסה</label><input type="time" id="eIn"><label>יציאה</label><input type="time" id="eOut">
+<div class="row" style="margin-top:14px"><button class="btn" id="eSave">שמור</button><button class="btn" style="background:#d64545" id="eDel">מחק</button><button class="btn" style="background:#888" id="eCancel">ביטול</button></div></dialog>
+<div class="toast" id="toast"></div>
+<script>
+const STORE={lat:31.8667193,lng:34.7422365},RADIUS=50,KEY='ap_attendance_demo_v1';
+const DAYS=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+const EMPLOYEES=[{id:1,name:'דנה כהן',role:'מנהלת משמרת'},{id:2,name:'יוסי לוי',role:'מוכר'},{id:3,name:'אבי מזרחי',role:'מחסנאי'},{id:4,name:'מיכל פרץ',role:'קופאית'},{id:5,name:'עומר ביטון',role:'טכנאי'}];
+const $=id=>document.getElementById(id),pad=n=>String(n).padStart(2,'0');
+const dkey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),hm=d=>pad(d.getHours())+':'+pad(d.getMinutes());
+function rng(s){return()=>(s=(s*16807)%2147483647)/2147483647}
+function sample(){const r=rng(42),out=[],now=new Date(),start=new Date(now.getFullYear(),now.getMonth()-1,1);
+ for(let d=new Date(start);dkey(d)<dkey(now);d.setDate(d.getDate()+1)){const wd=d.getDay();if(wd===6)continue;
+  EMPLOYEES.forEach(e=>{if(r()<0.15)return;const fri=wd===5;const i=new Date(d);i.setHours(fri?8:8+(r()<.4?1:0),Math.floor(r()*25),0,0);
+   const o=new Date(d);o.setHours(fri?13:16+Math.floor(r()*3),Math.floor(r()*60),0,0);out.push({id:crypto.randomUUID?crypto.randomUUID():Math.random()+'',emp:e.id,in:i.toISOString(),out:o.toISOString()})})}
+ [1,2,4].forEach(id=>{const i=new Date(now);i.setHours(8,10+id*4,0,0);if(i<now)out.push({id:'t'+id,emp:id,in:i.toISOString(),out:null})});return out}
+let db=JSON.parse(localStorage.getItem(KEY)||'null');if(!db){db=sample();save()}
+function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',2500)}
+const hours=p=>p.out?(new Date(p.out)-new Date(p.in))/36e5:0;
+const open=id=>db.find(p=>p.emp===id&&!p.out);
+EMPLOYEES.forEach(e=>{$('empSel').add(new Option(e.name,e.id));$('hEmp').add(new Option(e.name,e.id))});
+const m0=new Date().toISOString().slice(0,7);const pm=new Date();pm.setDate(1);pm.setMonth(pm.getMonth()-1);$('month').value=pm.getFullYear()+'-'+pad(pm.getMonth()+1);$('hMonth').value=m0;
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+ document.querySelectorAll('main section').forEach(s=>s.hidden=s.id!==b.dataset.t);render()});
+let dist=null;function hav(a,b,c,d){const R=6371e3,t=Math.PI/180,x=Math.sin((c-a)*t/2)**2+Math.cos(a*t)*Math.cos(c*t)*Math.sin((d-b)*t/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
+if(navigator.geolocation)navigator.geolocation.watchPosition(p=>{dist=hav(p.coords.latitude,p.coords.longitude,STORE.lat,STORE.lng);renderEmp()},e=>{dist=-1;renderEmp()},{enableHighAccuracy:true});else dist=-1;
+$('demo').onchange=renderEmp;$('empSel').onchange=renderEmp;
+function allowed(){return $('demo').checked||(dist!=null&&dist>=0&&dist<=RADIUS)}
+function renderEmp(){const d=$('dist'),demo=$('demo').checked;
+ if(demo){d.className='dist ok';d.textContent='מצב הדגמה פעיל – בדיקת GPS מושבתת'}
+ else if(dist==null){d.className='dist';d.textContent='מאתר מיקום…'}
+ else if(dist<0){d.className='dist bad';d.textContent='אין גישה למיקום – אפשר הרשאת GPS'}
+ else{const ok=dist<=RADIUS;d.className='dist '+(ok?'ok':'bad');d.textContent=(ok?'✅ בטווח החנות':'❌ מחוץ לטווח')+' · מרחק: '+(dist<1000?Math.round(dist)+' מ\'':(dist/1000).toFixed(1)+' ק"מ')}
+ const id=+$('empSel').value,o=open(id),a=allowed();$('bIn').disabled=!a||!!o;$('bOut').disabled=!a||!o;
+ $('status').innerHTML=o?'<span class="pill pin">בעבודה מאז '+hm(new Date(o.in))+'</span>':'<span class="pill pout">לא במשמרת</span>'}
+$('bIn').onclick=()=>{const id=+$('empSel').value;if(!allowed()||open(id))return;db.push({id:Date.now()+'',emp:id,in:new Date().toISOString(),out:null});save();renderEmp();toast('נרשמה כניסה ✔')};
+$('bOut').onclick=()=>{const o=open(+$('empSel').value);if(!allowed()||!o)return;o.out=new Date().toISOString();save();renderEmp();toast('נרשמה יציאה ✔ ('+hours(o).toFixed(2)+' ש\')')};
+function tick(){const n=new Date();$('bigclock').textContent=hm(n)+':'+pad(n.getSeconds());$('hdrclock').textContent=hm(n);$('today').textContent='יום '+DAYS[n.getDay()]+', '+n.toLocaleDateString('he-IL')}setInterval(tick,1000);tick();
+function monthRows(m,emp){return db.filter(p=>p.in.slice(0,7)===m&&(!emp||p.emp===emp)).sort((a,b)=>a.in<b.in?-1:1)}
+function renderMgr(){const ins=EMPLOYEES.filter(e=>open(e.id));$('nowCnt').textContent='('+ins.length+')';
+ $('nowList').innerHTML=ins.map(e=>'<div style="padding:6px 0">🟢 <b>'+e.name+'</b> <span class="muted">מאז '+hm(new Date(open(e.id).in))+'</span></div>').join('')||'<div class="muted">אין אף אחד בחנות</div>';
+ const m=$('month').value;$('empTbl').innerHTML=EMPLOYEES.map(e=>{const r=monthRows(m,e.id).filter(p=>p.out);return '<tr><td>'+e.name+'</td><td>'+e.role+'</td><td>'+new Set(r.map(p=>p.in.slice(0,10))).size+'</td><td>'+r.reduce((s,p)=>s+hours(p),0).toFixed(1)+'</td></tr>'}).join('')}
+$('month').onchange=renderMgr;$('hEmp').onchange=renderHist;$('hMonth').onchange=renderHist;
+function renderHist(){const r=db.filter(p=>p.emp===+$('hEmp').value&&p.in.slice(0,7)===$('hMonth').value).sort((a,b)=>a.in<b.in?1:-1);
+ $('hTbl').innerHTML=r.map(p=>{const i=new Date(p.in);return '<tr><td>'+i.toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit'})+'</td><td>'+DAYS[i.getDay()]+'</td><td>'+hm(i)+'</td><td>'+(p.out?hm(new Date(p.out)):'<span class="pill pin">פתוח</span>')+'</td><td>'+(p.out?hours(p).toFixed(2):'')+'</td><td><button class="btn s" onclick="edit(\''+p.id+'\')">תקן</button></td></tr>'}).join('')||'<tr><td colspan=6 class="muted">אין החתמות</td></tr>'}
+let cur;window.edit=id=>{cur=db.find(p=>p.id===id);const e=EMPLOYEES.find(x=>x.id===cur.emp);$('dlgInfo').textContent=e.name+' · '+new Date(cur.in).toLocaleDateString('he-IL');$('eIn').value=hm(new Date(cur.in));$('eOut').value=cur.out?hm(new Date(cur.out)):'';$('dlg').showModal()};
+function setT(iso,t){const d=new Date(iso);const[h,m]=t.split(':');d.setHours(+h,+m,0,0);return d.toISOString()}
+$('eSave').onclick=()=>{if(!$('eIn').value)return;cur.in=setT(cur.in,$('eIn').value);cur.out=$('eOut').value?setT(cur.in,$('eOut').value):null;if(cur.out&&cur.out<cur.in)return toast('יציאה לפני כניסה');cur.edited=true;save();$('dlg').close();render();toast('ההחתמה עודכנה')};
+$('eDel').onclick=()=>{if(confirm('למחוק החתמה?')){db=db.filter(p=>p!==cur);save();$('dlg').close();render()}};$('eCancel').onclick=()=>$('dlg').close();
+$('reset').onclick=()=>{if(confirm('לאפס לנתוני הדגמה?')){db=sample();save();render();toast('אופס')}};
+function buildWorkbook(m){const aoa=[['דוח נוכחות חודשי – Auto Point, האומן 1 יבנה – '+m],['⚠️ נתונים לדוגמה – אינם נתונים אמיתיים'],[],['עובד','תאריך','יום','כניסה','יציאה','שעות ביום']];
+ const sum=[[],['סיכום לפי עובד'],['עובד','סה"כ ימי עבודה','סה"כ שעות']];
+ EMPLOYEES.forEach(e=>{const r=monthRows(m,e.id);let t=0;r.forEach(p=>{const i=new Date(p.in),h=hours(p);t+=h;aoa.push([e.name,i.toLocaleDateString('he-IL'),DAYS[i.getDay()],hm(i),p.out?hm(new Date(p.out)):'חסר',p.out?+h.toFixed(2):''])});
+  const days=new Set(r.map(p=>p.in.slice(0,10))).size;aoa.push(['סה"כ – '+e.name,'','','','סה"כ ימי עבודה: '+days,'סה"כ שעות: '+t.toFixed(2)],[]);sum.push([e.name,days,+t.toFixed(2)])});
+ const ws=XLSX.utils.aoa_to_sheet(aoa.concat(sum));ws['!cols']=[{wch:18},{wch:12},{wch:8},{wch:8},{wch:18},{wch:16}];
+ const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'דוח '+m);wb.Workbook={Views:[{RTL:true}]};return wb}
+window.buildWorkbook=buildWorkbook;
+$('xls').onclick=()=>XLSX.writeFile(buildWorkbook($('month').value),'דוח_נוכחות_'+$('month').value+'_לדוגמה.xlsx');
+function render(){renderEmp();renderMgr();renderHist()}render();
+</script></body></html>
