@@ -41,6 +41,14 @@ dialog{border:0;border-radius:14px;width:90%;max-width:400px}dialog label{displa
 <section id="mgr" hidden>
  <div class="card"><h3 style="margin-top:0">בחנות עכשיו <span id="nowCnt"></span></h3><div id="nowList"></div></div>
  <div class="card"><h3 style="margin-top:0">עובדים</h3><table><thead><tr><th>שם</th><th>תפקיד</th><th>ימים החודש</th><th>שעות החודש</th></tr></thead><tbody id="empTbl"></tbody></table></div>
+<div class="card"><h3 style="margin-top:0">🔔 תזכורות לעובדים <span class="soon">הדגמה – לא נשלח דבר</span></h3>
+ <div class="muted">תזכורת למי ששכח להחתים כניסה או יציאה.</div>
+ <label class="toggle" style="background:#eef4ff;border-color:#7aa"><input type="checkbox" checked disabled> התראת Push באפליקציה</label>
+ <label class="toggle" style="background:#e9f9ee;border-color:#4a8"><input type="checkbox" checked disabled> הודעת WhatsApp</label>
+ <div class="row" style="margin-top:8px"><div style="flex:1"><span class="muted">תזכורת כניסה אם לא הוחתם עד</span><input type="time" value="09:15"></div><div style="flex:1"><span class="muted">תזכורת יציאה אם לא הוחתם עד</span><input type="time" value="19:30"></div></div>
+ <div class="mock"><b>תצוגה מקדימה – Push</b><div style="background:#222;color:#fff;border-radius:12px;padding:10px;margin-top:6px">🔔 <b>Auto Point · שעון נוכחות</b><br>היי יוסי, לא נרשמה כניסה היום. הגעת לחנות? הקש להחתמה.</div></div>
+ <div class="mock"><b>תצוגה מקדימה – WhatsApp</b><div style="background:#dcf8c6;border-radius:10px;padding:10px;margin-top:6px">שלום אבי 👋<br>לא נרשמה יציאה היום ב-Auto Point (יבנה).<br>שכחת להחתים? השב "יצאתי 18:45" או לחץ: <u>החתם יציאה</u><br><span class="muted">19:30 ✓✓</span></div></div>
+</div>
  <div class="card"><h3 style="margin-top:0">דוח חודשי לאקסל</h3><div class="row"><input type="month" id="month"><button class="btn" id="xls">הורד Excel</button></div>
  <button class="btn" style="background:#888;margin-top:10px" id="reset">איפוס נתוני הדגמה</button></div>
 </section>
