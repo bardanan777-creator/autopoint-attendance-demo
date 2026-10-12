@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Auto Point – שעון נוכחות (הדגמה)</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0d3b66"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="נוכחות AP"><title>Auto Point – שעון נוכחות (הדגמה)</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,Arial,sans-serif;background:#f1f4f8;color:#1c2430}
@@ -66,6 +66,11 @@ dialog{border:0;border-radius:14px;width:90%;max-width:400px}dialog label{displa
  <div class="card" style="padding:6px"><table><thead><tr><th>תאריך</th><th>יום</th><th>כניסה</th><th>יציאה</th><th>שעות</th><th></th></tr></thead><tbody id="hTbl"></tbody></table></div>
 </section>
 <section id="fut" hidden>
+<div class="card feat" id="install"><h3>📲 התקנה כאפליקציה בטלפון</h3>
+ <b>iPhone (Safari):</b> פתחו את הקישור ב-Safari ← לחצו על כפתור השיתוף (ריבוע עם חץ למעלה) ← "הוסף למסך הבית" ← "הוסף".<br><br>
+ <b>Android (Chrome):</b> פתחו את הקישור ב-Chrome ← תפריט ⋮ ← "התקן אפליקציה" / "הוסף למסך הבית" ← "התקן".<br>
+ <button class="btn" id="instBtn" hidden style="margin-top:10px">התקן עכשיו</button>
+ <div class="muted" style="margin-top:6px">לאחר ההתקנה האפליקציה נפתחת במסך מלא, וההתחברות נשמרת.</div></div>
  <div class="card feat"><span class="soon">בקרוב</span><h3>⏱️ שעות נוספות</h3>חישוב אוטומטי של 125%/150% לפי חוק, מעל 9 שעות ביום. השעות נספרות ברצף מכניסה ועד יציאה (ללא החתמת הפסקות).
   <div class="mock">דנה כהן · השבוע: 41.5 ש' רגילות · <b>3.5 ש' נוספות (125%)</b></div></div>
  <div class="card feat"><span class="soon">בקרוב</span><h3>🌴 בקשות חופש ומחלה</h3>העובד מגיש בקשה (כולל צילום אישור מחלה), המנהל מאשר/דוחה.
@@ -145,5 +150,6 @@ function buildWorkbook(m){const aoa=[['דוח נוכחות חודשי – Auto P
  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'דוח '+m);wb.Workbook={Views:[{RTL:true}]};return wb}
 window.buildWorkbook=buildWorkbook;
 $('xls').onclick=()=>XLSX.writeFile(buildWorkbook($('month').value),'דוח_נוכחות_'+$('month').value+'_לדוגמה.xlsx');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');let dp;addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('instBtn').hidden=false});$('instBtn').onclick=()=>dp&&dp.prompt();
 function render(){renderEmp();renderMgr();renderHist()}render();showEmp();gate();
 </script></body></html>
